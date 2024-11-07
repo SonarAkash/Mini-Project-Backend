@@ -21,6 +21,8 @@ public class WasteOrder {
     @JoinColumn(name = "biogas_company_id")
     private BiogasCompany biogasCompany;
 
+    private Long generatorId;
+
     // Foreign key to link to the available waste
     @ManyToOne
     @JoinColumn(name = "available_waste_id")
@@ -29,5 +31,6 @@ public class WasteOrder {
     private LocalDateTime orderDate;
     private String status; // e.g., booked, completed
     private int quantity;
+
 
 }

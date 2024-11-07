@@ -2,7 +2,9 @@ package com.TY_CSE.Project.Controller;
 
 import com.TY_CSE.Project.DTO.AuthRequest;
 import com.TY_CSE.Project.DTO.AuthResponse;
+import com.TY_CSE.Project.Model.Role;
 import com.TY_CSE.Project.Model.User;
+import com.TY_CSE.Project.Repository.UserRepository;
 import com.TY_CSE.Project.Service.UserService;
 import com.TY_CSE.Project.Util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +39,8 @@ public class UserController {
 
     @Autowired // Properly inject JwtUtil
     private JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository userRepository;
 
     // User registration
     @PostMapping("/register")
@@ -67,11 +72,17 @@ public class UserController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            // Fetch the user by email to retrieve the role
+            User user = userRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            Role role = user.getRole(); // Assuming role is an enum in the User entity
+
             // Generate JWT Token
             String token = jwtUtil.generateToken(loginRequest.getEmail());
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity.ok(new AuthResponse(token, role, "success"));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Invalid email or password"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, null,"Invalid email or password"));
         }
     }
 
