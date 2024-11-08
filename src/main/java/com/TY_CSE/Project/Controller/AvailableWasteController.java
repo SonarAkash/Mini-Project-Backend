@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +47,14 @@ public class AvailableWasteController {
                 .map(availableWasteService::convertToDTO)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(dtoList); // Returns 200 with data if available
+        List<AvailableWasteDTO> newDTOList = new LinkedList<>();
+        for(int i=0; i<dtoList.size(); i++){
+            AvailableWasteDTO waste = dtoList.get(i);
+            if(waste.getQuantity() != 0){
+                newDTOList.add(waste);
+            }
+        }
+        return ResponseEntity.ok(newDTOList); // Returns 200 with data if available
     }
 
     @GetMapping("/uploads/{filename}")

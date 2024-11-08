@@ -65,6 +65,7 @@ public class WasteController {
                 .orElseThrow(() -> new IllegalArgumentException("Waste item not found"));
 
         if (availableWaste.getQuantity() < quantity) {
+            System.out.println("Not enough waste available to book.");
             return ResponseEntity.status(400).body("Not enough waste available to book.");
         }
 
@@ -84,11 +85,13 @@ public class WasteController {
         availableWaste.setQuantity(availableWaste.getQuantity() - quantity);
 
         // If the quantity is now 0, remove the waste entry from the table
-        if (availableWaste.getQuantity() == 0) {
-            availableWasteRepository.delete(availableWaste);
-        } else {
-            availableWasteRepository.save(availableWaste);
-        }
+//        if (availableWaste.getQuantity() == 0) {
+//            availableWasteRepository.delete(availableWaste);
+//        } else {
+//            availableWasteRepository.save(availableWaste);
+//        }
+
+        availableWasteRepository.save(availableWaste);
 
         return ResponseEntity.ok("Waste booked successfully.");
     }
